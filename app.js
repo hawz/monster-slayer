@@ -1,21 +1,23 @@
 new Vue({
-  el: '#app',
+  el: "#app",
   data: {
     playerHealth: 100,
     monsterHealth: 100,
     gameIsRunning: false,
-    turns: []
+    turns: [],
+    currentTurn: 0
   },
   methods: {
     startGame: function() {
       this.playerHealth = 100;
       this.monsterHealth = 100;
       this.gameIsRunning = true;
+      this.turns.length = 0;
     },
     attack: function() {
       var damage = this.calculateDamage(3, 10);
       this.monsterHealth -= damage;
-      this.logTurn(true, damage)
+      this.logTurn(true, damage);
       if (this.checkWin()) {
         return;
       }
@@ -25,7 +27,7 @@ new Vue({
     specialAttack: function() {
       var damage = this.calculateDamage(10, 20);
       this.monsterHealth -= damage;
-      this.logTurn(true, damage, true)
+      this.logTurn(true, damage, true);
       if (this.checkWin()) {
         return;
       }
@@ -37,11 +39,15 @@ new Vue({
       } else {
         this.playerHealth = 100;
       }
-      
+
+      // here is the same actions as the logTurn method, 
+      // but with a different message though
       this.turns.unshift({
         isPlayer: true,
-        text: 'Player heals for 10'
+        text: "Player heals for 10",
+        id: this.currentTurn + 1
       });
+      this.currentTurn++;
 
       this.monsterAttacks();
     },
@@ -53,14 +59,14 @@ new Vue({
     },
     checkWin: function() {
       if (this.monsterHealth <= 0) {
-        if (confirm('You won! New Game?')) {
+        if (confirm("You won! New Game?")) {
           this.startGame();
         } else {
           this.gameIsRunning = false;
         }
         return true;
       } else if (this.playerHealth <= 0) {
-        if (confirm('You lost! New Game?')) {
+        if (confirm("You lost! New Game?")) {
           this.startGame();
         } else {
           this.gameIsRunning = false;
@@ -76,11 +82,17 @@ new Vue({
       this.checkWin();
     },
     logTurn: function(isPlayer, damage, special = false) {
-      var text = isPlayer ? special ? 'Player hits Monster hard for ' : 'Player hits Monster for ' : 'Monster hits Player for '
+      var text = isPlayer
+        ? special
+          ? "Player hits Monster hard for "
+          : "Player hits Monster for "
+        : "Monster hits Player for ";
       this.turns.unshift({
         isPlayer: isPlayer,
-        text: text + damage
+        text: text + damage,
+        id: this.currentTurn + 1
       });
+      this.currentTurn++;
     }
   }
 });
